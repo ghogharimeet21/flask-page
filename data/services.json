@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "icon": "\ud83e\udd16",
+        "title": "Custom AI Chatbots",
+        "description": "Intelligent conversational AI solutions designed specifically for your business needs. Enhance customer engagement and automate support with state-of-the-art chatbot technology."
+    },
+    {
+        "id": 2,
+        "icon": "\u26a1",
+        "title": "AI Workflow Integration",
+        "description": "Seamlessly integrate AI into your existing workflows. Boost productivity and efficiency by automating repetitive tasks and enhancing decision-making processes."
+    },
+    {
+        "id": 3,
+        "icon": "\ud83d\udcc8",
+        "title": "Trading Setup Solutions",
+        "description": "Custom stock market trading setups tailored for specific niches. Advanced algorithms and analytics to give you a competitive edge in the market."
+    },
+    {
+        "id": 4,
+        "icon": "\ud83d\uded2",
+        "title": "E-commerce Websites",
+        "description": "Full-featured online stores designed to convert visitors into customers. Responsive, secure, and optimized for maximum sales performance."
+    },
+    {
+        "id": 6,
+        "icon": "\ud83c\udf10",
+        "title": "Web-Based Solutions",
+        "description": "Modern, scalable web applications that work seamlessly across all devices. From enterprise systems to consumer platforms, we build it all."
+    }
+]

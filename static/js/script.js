@@ -1,7 +1,11 @@
+// ============= static/js/script.js =============
+// Landing page scripts
 
 // Create floating particles
 function createParticles() {
     const hero = document.querySelector('.hero');
+    if (!hero) return;
+    
     for (let i = 0; i < 20; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
@@ -27,50 +31,27 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Intersection Observer for animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
-        }
-    });
-}, observerOptions);
-
-document.querySelectorAll('.service-card').forEach(card => {
-    observer.observe(card);
-});
-
-// Initialize
-createParticles();
-
 // Mobile menu toggle
-const menuToggle = document.querySelector('.menu-toggle');
-const mobileMenu = document.querySelector('.mobile-menu');
-const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
-
-menuToggle.addEventListener('click', () => {
-    menuToggle.classList.toggle('active');
-    mobileMenu.classList.toggle('active');
-});
-
-// Close mobile menu when clicking a link
-mobileMenuLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        menuToggle.classList.remove('active');
-        mobileMenu.classList.remove('active');
-    });
-});
+function toggleMobileMenu() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (menuToggle && mobileMenu) {
+        menuToggle.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    }
+}
 
 // Close mobile menu when clicking outside
 document.addEventListener('click', (e) => {
-    if (!menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
-        menuToggle.classList.remove('active');
-        mobileMenu.classList.remove('active');
+    const menuToggle = document.querySelector('.menu-toggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (menuToggle && mobileMenu) {
+        if (!menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+            menuToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        }
     }
 });
 
@@ -81,5 +62,215 @@ window.addEventListener('scroll', () => {
     if (hero) {
         hero.style.transform = `translateY(${scrolled * 0.5}px)`;
         hero.style.opacity = 1 - (scrolled / 500);
+    }
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    createParticles();
+});
+
+
+// ============= static/js/admin.js =============
+// Admin panel scripts
+
+let currentServiceId = null;
+let currentBlogId = null;
+
+// Service Modal Functions
+function openServiceModal(service = null) {
+    const modal = document.getElementById('serviceModal');
+    const title = document.getElementById('serviceModalTitle');
+    
+    if (service) {
+        title.textContent = 'Edit Service';
+        document.getElementById('serviceId').value = service.id;
+        document.getElementById('serviceIcon').value = service.icon;
+        document.getElementById('serviceTitle').value = service.title;
+        document.getElementById('serviceDescription').value = service.description;
+        currentServiceId = service.id;
+    } else {
+        title.textContent = 'Add Service';
+        document.getElementById('serviceForm').reset();
+        document.getElementById('serviceId').value = '';
+        currentServiceId = null;
+    }
+    
+    modal.classList.add('active');
+}
+
+function closeServiceModal() {
+    const modal = document.getElementById('serviceModal');
+    modal.classList.remove('active');
+    document.getElementById('serviceForm').reset();
+    currentServiceId = null;
+}
+
+function editService(service) {
+    openServiceModal(service);
+}
+
+async function deleteService(serviceId) {
+    if (!confirm('Are you sure you want to delete this service?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/services/${serviceId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Error deleting service');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting service');
+    }
+}
+
+// Blog Modal Functions
+function openBlogModal(blog = null) {
+    const modal = document.getElementById('blogModal');
+    const title = document.getElementById('blogModalTitle');
+    
+    if (blog) {
+        title.textContent = 'Edit Blog';
+        document.getElementById('blogId').value = blog.id;
+        document.getElementById('blogTitle').value = blog.title;
+        document.getElementById('blogExcerpt').value = blog.excerpt;
+        document.getElementById('blogAuthor').value = blog.author;
+        document.getElementById('blogDate').value = blog.date;
+        document.getElementById('blogImage').value = blog.image;
+        currentBlogId = blog.id;
+    } else {
+        title.textContent = 'Add Blog';
+        document.getElementById('blogForm').reset();
+        document.getElementById('blogId').value = '';
+        currentBlogId = null;
+    }
+    
+    modal.classList.add('active');
+}
+
+function closeBlogModal() {
+    const modal = document.getElementById('blogModal');
+    modal.classList.remove('active');
+    document.getElementById('blogForm').reset();
+    currentBlogId = null;
+}
+
+function editBlog(blog) {
+    openBlogModal(blog);
+}
+
+async function deleteBlog(blogId) {
+    if (!confirm('Are you sure you want to delete this blog?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/blogs/${blogId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Error deleting blog');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting blog');
+    }
+}
+
+// Form Submissions
+document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const serviceData = {
+        icon: document.getElementById('serviceIcon').value,
+        title: document.getElementById('serviceTitle').value,
+        description: document.getElementById('serviceDescription').value
+    };
+    
+    const serviceId = document.getElementById('serviceId').value;
+    const url = serviceId ? `/api/services/${serviceId}` : '/api/services';
+    const method = serviceId ? 'PUT' : 'POST';
+    
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(serviceData)
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Error saving service');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving service');
+    }
+});
+
+document.getElementById('blogForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const blogData = {
+        title: document.getElementById('blogTitle').value,
+        excerpt: document.getElementById('blogExcerpt').value,
+        author: document.getElementById('blogAuthor').value,
+        date: document.getElementById('blogDate').value,
+        image: document.getElementById('blogImage').value
+    };
+    
+    const blogId = document.getElementById('blogId').value;
+    const url = blogId ? `/api/blogs/${blogId}` : '/api/blogs';
+    const method = blogId ? 'PUT' : 'POST';
+    
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(blogData)
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Error saving blog');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving blog');
+    }
+});
+
+// Close modals when clicking outside
+window.addEventListener('click', (e) => {
+    const serviceModal = document.getElementById('serviceModal');
+    const blogModal = document.getElementById('blogModal');
+    
+    if (e.target === serviceModal) {
+        closeServiceModal();
+    }
+    if (e.target === blogModal) {
+        closeBlogModal();
     }
 });

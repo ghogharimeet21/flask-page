@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-panel">
+    <div class="admin-header">
+        <h1>Admin Dashboard</h1>
+        <div class="admin-actions">
+            <a href="{{ url_for('index') }}" class="btn-secondary">View Site</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn-danger">Logout</a>
+        </div>
+    </div>
+
+    <!-- Services Management -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h2>Services</h2>
+            <button onclick="openServiceModal()" class="btn-primary">+ Add Service</button>
+        </div>
+        <div class="services-grid" id="servicesGrid">
+            {% for service in services %}
+            <div class="admin-card">
+                <div class="card-header">
+                    <span class="card-icon">{{ service.icon }}</span>
+                    <div class="card-actions">
+                        <button onclick='editService({{ service | tojson }})' class="btn-edit">✏️</button>
+                        <button onclick="deleteService({{ service.id }})" class="btn-delete">🗑️</button>
+                    </div>
+                </div>
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Blogs Management -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h2>Blogs</h2>
+            <button onclick="openBlogModal()" class="btn-primary">+ Add Blog</button>
+        </div>
+        <div class="blogs-grid" id="blogsGrid">
+            {% for blog in blogs %}
+            <div class="admin-card">
+                <div class="blog-admin-image">{{ blog.image }}</div>
+                <div class="blog-admin-content">
+                    <div class="card-actions">
+                        <button onclick='editBlog({{ blog | tojson }})' class="btn-edit">✏️</button>
+                        <button onclick="deleteBlog({{ blog.id }})" class="btn-delete">🗑️</button>
+                    </div>
+                    <p class="blog-meta">{{ blog.date }} • {{ blog.author }}</p>
+                    <h3>{{ blog.title }}</h3>
+                    <p>{{ blog.excerpt }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Service Modal -->
+<div id="serviceModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="serviceModalTitle">Add Service</h3>
+            <button onclick="closeServiceModal()" class="modal-close">&times;</button>
+        </div>
+        <form id="serviceForm">
+            <input type="hidden" id="serviceId">
+            <div class="form-group">
+                <label>Icon (Emoji)</label>
+                <input type="text" id="serviceIcon" maxlength="2" required>
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="serviceTitle" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="serviceDescription" required></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="btn-primary">💾 Save Service</button>
+                <button type="button" onclick="closeServiceModal()" class="btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Blog Modal -->
+<div id="blogModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="blogModalTitle">Add Blog</h3>
+            <button onclick="closeBlogModal()" class="modal-close">&times;</button>
+        </div>
+        <form id="blogForm">
+            <input type="hidden" id="blogId">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="blogTitle" required>
+            </div>
+            <div class="form-group">
+                <label>Excerpt</label>
+                <textarea id="blogExcerpt" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Author</label>
+                <input type="text" id="blogAuthor" required>
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="blogDate" required>
+            </div>
+            <div class="form-group">
+                <label>Image (Emoji)</label>
+                <input type="text" id="blogImage" maxlength="2" required>
+            </div>
+            <div class="modal-actions">
+                <button type="submit" class="btn-primary">💾 Save Blog</button>
+                <button type="button" onclick="closeBlogModal()" class="btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
