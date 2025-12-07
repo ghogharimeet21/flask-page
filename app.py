@@ -61,7 +61,8 @@ DEFAULT_BLOGS = [
         "excerpt": "Exploring how artificial intelligence is transforming modern enterprises and creating new opportunities for growth.",
         "author": "Tech Team",
         "date": "2024-03-15",
-        "image": "🤖"
+        "image": "🤖",
+        "starred": True
     },
     {
         "id": 2,
@@ -69,7 +70,8 @@ DEFAULT_BLOGS = [
         "excerpt": "Best practices and architectural patterns for creating web applications that can handle millions of users.",
         "author": "Dev Team",
         "date": "2024-03-10",
-        "image": "🌐"
+        "image": "🌐",
+        "starred": True
     },
     {
         "id": 3,
@@ -77,7 +79,8 @@ DEFAULT_BLOGS = [
         "excerpt": "The latest trends shaping online retail and how businesses can stay ahead of the competition.",
         "author": "Marketing Team",
         "date": "2024-03-05",
-        "image": "🛒"
+        "image": "🛒",
+        "starred": True
     }
 ]
 
@@ -105,7 +108,14 @@ def get_blogs():
 def index():
     services = get_services()
     blogs = get_blogs()
-    return render_template('index.html', services=services, blogs=blogs)
+    # Only show starred blogs on home page
+    starred_blogs = [blog for blog in blogs if blog.get('starred', False)]
+    return render_template('index.html', services=services, blogs=starred_blogs)
+
+@app.route('/blogs')
+def blogs_page():
+    blogs = get_blogs()
+    return render_template('blogs.html', blogs=blogs)
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -185,6 +195,9 @@ def api_add_blog():
     blogs = get_blogs()
     new_blog = request.json
     new_blog['id'] = max([b['id'] for b in blogs], default=0) + 1
+    # Default starred to False for new blogs
+    if 'starred' not in new_blog:
+        new_blog['starred'] = False
     blogs.append(new_blog)
     save_json(BLOGS_FILE, blogs)
     return jsonify(new_blog)
@@ -198,6 +211,9 @@ def api_update_blog(blog_id):
     updated_blog = request.json
     for i, blog in enumerate(blogs):
         if blog['id'] == blog_id:
+            # Preserve starred status if not provided in update
+            if 'starred' not in updated_blog:
+                updated_blog['starred'] = blog.get('starred', False)
             blogs[i] = {**updated_blog, 'id': blog_id}
             save_json(BLOGS_FILE, blogs)
             return jsonify(blogs[i])
@@ -212,6 +228,20 @@ def api_delete_blog(blog_id):
     blogs = [b for b in blogs if b['id'] != blog_id]
     save_json(BLOGS_FILE, blogs)
     return jsonify({'success': True})
+
+@app.route('/api/blogs/<int:blog_id>/star', methods=['PUT'])
+def api_toggle_blog_star(blog_id):
+    if not session.get('admin'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    blogs = get_blogs()
+    for i, blog in enumerate(blogs):
+        if blog['id'] == blog_id:
+            # Toggle starred status
+            blogs[i]['starred'] = not blog.get('starred', False)
+            save_json(BLOGS_FILE, blogs)
+            return jsonify({'success': True, 'starred': blogs[i]['starred']})
+    return jsonify({'error': 'Blog not found'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)

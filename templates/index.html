@@ -10,7 +10,7 @@
         <div class="nav-links">
             <a href="#home">Home</a>
             <a href="#services">Services</a>
-            <a href="#blogs">Blogs</a>
+            <a href="{{ url_for('blogs_page') }}">Blogs</a>
             <a href="#contact">Contact</a>
             <!-- <a href="{{ url_for('admin_login') }}" class="admin-link">Admin</a> -->
         </div>
@@ -26,7 +26,7 @@
 <div class="mobile-menu" id="mobileMenu">
     <a href="#home" onclick="toggleMobileMenu()">Home</a>
     <a href="#services" onclick="toggleMobileMenu()">Services</a>
-    <a href="#blogs" onclick="toggleMobileMenu()">Blogs</a>
+    <a href="{{ url_for('blogs_page') }}" onclick="toggleMobileMenu()">Blogs</a>
     <a href="#contact" onclick="toggleMobileMenu()">Contact</a>
 </div>
 
@@ -59,6 +59,7 @@
 <section class="blogs" id="blogs">
     <div class="container">
         <h2 class="section-title">Latest Insights</h2>
+        {% if blogs %}
         <div class="blogs-grid">
             {% for blog in blogs %}
             <div class="blog-card">
@@ -70,11 +71,20 @@
                     </div>
                     <h3>{{ blog.title }}</h3>
                     <p>{{ blog.excerpt }}</p>
-                    <a href="#" class="read-more">Read More →</a>
+                    <a href="{{ url_for('blogs_page') }}" class="read-more">Read More →</a>
                 </div>
             </div>
             {% endfor %}
         </div>
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="{{ url_for('blogs_page') }}" class="cta-button">View All Blogs</a>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px 20px;">
+            <p style="font-size: 1.2rem; color: #a0c4e8; margin-bottom: 20px;">No featured blogs available at the moment.</p>
+            <a href="{{ url_for('blogs_page') }}" class="cta-button">View All Blogs</a>
+        </div>
+        {% endif %}
     </div>
 </section>
 

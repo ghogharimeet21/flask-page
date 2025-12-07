@@ -47,10 +47,20 @@
                 <div class="blog-admin-image">{{ blog.image }}</div>
                 <div class="blog-admin-content">
                     <div class="card-actions">
+                        <button onclick='toggleBlogStar({{ blog.id }}, {{ blog.get("starred", False) | lower }}, event)' 
+                                class="btn-star {% if blog.get('starred', False) %}starred{% endif %}" 
+                                title="{% if blog.get('starred', False) %}Unstar to hide from home page{% else %}Star to show on home page{% endif %}">
+                            {% if blog.get('starred', False) %}⭐{% else %}☆{% endif %}
+                        </button>
                         <button onclick='editBlog({{ blog | tojson }})' class="btn-edit">✏️</button>
                         <button onclick="deleteBlog({{ blog.id }})" class="btn-delete">🗑️</button>
                     </div>
-                    <p class="blog-meta">{{ blog.date }} • {{ blog.author }}</p>
+                    <p class="blog-meta">
+                        {{ blog.date }} • {{ blog.author }}
+                        {% if blog.get('starred', False) %}
+                        <span class="star-badge">⭐ Featured</span>
+                        {% endif %}
+                    </p>
                     <h3>{{ blog.title }}</h3>
                     <p>{{ blog.excerpt }}</p>
                 </div>

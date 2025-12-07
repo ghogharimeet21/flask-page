@@ -5,7 +5,8 @@
         "excerpt": "Exploring how artificial intelligence is transforming modern enterprises and creating new opportunities for growth.",
         "author": "Tech Team",
         "date": "2024-03-15",
-        "image": "\ud83e\udd16"
+        "image": "\ud83e\udd16",
+        "starred": true
     },
     {
         "id": 2,
@@ -13,7 +14,8 @@
         "excerpt": "Best practices and architectural patterns for creating web applications that can handle millions of users.",
         "author": "Dev Team",
         "date": "2024-03-10",
-        "image": "\ud83c\udf10"
+        "image": "\ud83c\udf10",
+        "starred": true
     },
     {
         "id": 3,
@@ -21,6 +23,7 @@
         "excerpt": "The latest trends shaping online retail and how businesses can stay ahead of the competition.",
         "author": "Marketing Team",
         "date": "2024-03-05",
-        "image": "\ud83d\uded2"
+        "image": "\ud83d\uded2",
+        "starred": true
     }
 ]

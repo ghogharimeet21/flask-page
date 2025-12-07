@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}All Blogs - IT Agency{% endblock %}
+
+{% block content %}
+<!-- Navigation -->
+<nav>
+    <div class="nav-content">
+        <div class="logo">LOGO</div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('index') }}#services">Services</a>
+            <a href="{{ url_for('blogs_page') }}">Blogs</a>
+            <a href="{{ url_for('index') }}#contact">Contact</a>
+        </div>
+        <div class="menu-toggle" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="{{ url_for('index') }}" onclick="toggleMobileMenu()">Home</a>
+    <a href="{{ url_for('index') }}#services" onclick="toggleMobileMenu()">Services</a>
+    <a href="{{ url_for('blogs_page') }}" onclick="toggleMobileMenu()">Blogs</a>
+    <a href="{{ url_for('index') }}#contact" onclick="toggleMobileMenu()">Contact</a>
+</div>
+
+<!-- Blog Listing Header -->
+<section class="blog-listing-header">
+    <div class="container">
+        <h1 class="section-title">All Blogs</h1>
+        <p class="section-subtitle">Explore our latest insights and articles</p>
+        
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" 
+                   id="blogSearch" 
+                   class="search-input" 
+                   placeholder="Search blogs by title..." 
+                   onkeyup="filterBlogs()">
+            <span class="search-icon">🔍</span>
+        </div>
+        
+        <div class="blog-count" id="blogCount">
+            Showing <span id="blogCountNumber">{{ blogs|length }}</span> blog{{ 's' if blogs|length != 1 else '' }}
+        </div>
+    </div>
+</section>
+
+<!-- Blogs Section -->
+<section class="blogs blog-listing">
+    <div class="container">
+        <div class="blogs-grid" id="blogsGrid">
+            {% for blog in blogs %}
+            <div class="blog-card" data-title="{{ blog.title|lower }}">
+                <div class="blog-image">{{ blog.image }}</div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span>👤 {{ blog.author }}</span>
+                        <span>📅 {{ blog.date }}</span>
+                        {% if blog.get('starred', False) %}
+                        <span class="star-badge">⭐ Featured</span>
+                        {% endif %}
+                    </div>
+                    <h3>{{ blog.title }}</h3>
+                    <p>{{ blog.excerpt }}</p>
+                    <a href="#" class="read-more">Read More →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- No Results Message -->
+        <div id="noResults" class="no-results" style="display: none;">
+            <p>No blogs found matching your search.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer id="contact">
+    <div class="container">
+        <div class="footer-content">
+            <h3>Ready to Transform Your Business?</h3>
+            <p>Let's discuss how we can help you achieve your goals</p>
+            <a href="tel:+1234567890" class="contact-button">Get In Touch</a>
+            <p style="margin-top: 30px; font-size: 0.9rem;">© 2024 Your IT Agency. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Blog search functionality
+function filterBlogs() {
+    const searchInput = document.getElementById('blogSearch');
+    const searchTerm = searchInput.value.toLowerCase();
+    const blogCards = document.querySelectorAll('.blog-card');
+    const noResults = document.getElementById('noResults');
+    let visibleCount = 0;
+    
+    blogCards.forEach(card => {
+        const title = card.getAttribute('data-title');
+        if (title.includes(searchTerm)) {
+            card.style.display = '';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Update count
+    const countElement = document.getElementById('blogCountNumber');
+    if (countElement) {
+        countElement.textContent = visibleCount;
+    }
+    
+    // Show/hide no results message
+    if (visibleCount === 0 && searchTerm !== '') {
+        noResults.style.display = 'block';
+    } else {
+        noResults.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

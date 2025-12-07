@@ -193,6 +193,58 @@ async function deleteBlog(blogId) {
     }
 }
 
+// Toggle blog star status
+async function toggleBlogStar(blogId, currentStarred, evt) {
+    const event = evt || window.event;
+    const button = event ? event.target.closest('.btn-star') : document.querySelector(`.btn-star[onclick*="${blogId}"]`);
+    if (!button) return;
+    
+    try {
+        const response = await fetch(`/api/blogs/${blogId}/star`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // Update the button and badge without reloading
+            const card = button.closest('.admin-card');
+            const meta = card.querySelector('.blog-meta');
+            
+            if (data.starred) {
+                button.innerHTML = '⭐';
+                button.classList.add('starred');
+                button.setAttribute('title', 'Unstar to hide from home page');
+                button.setAttribute('onclick', `toggleBlogStar(${blogId}, true, event)`);
+                // Add featured badge if it doesn't exist
+                if (!meta.querySelector('.star-badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'star-badge';
+                    badge.textContent = '⭐ Featured';
+                    meta.appendChild(badge);
+                }
+            } else {
+                button.innerHTML = '☆';
+                button.classList.remove('starred');
+                button.setAttribute('title', 'Star to show on home page');
+                button.setAttribute('onclick', `toggleBlogStar(${blogId}, false, event)`);
+                // Remove featured badge
+                const badge = meta.querySelector('.star-badge');
+                if (badge) {
+                    badge.remove();
+                }
+            }
+        } else {
+            alert('Error updating blog star status');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error updating blog star status');
+    }
+}
+
 // Form Submissions
 document.getElementById('serviceForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -241,6 +293,22 @@ document.getElementById('blogForm').addEventListener('submit', async (e) => {
     const blogId = document.getElementById('blogId').value;
     const url = blogId ? `/api/blogs/${blogId}` : '/api/blogs';
     const method = blogId ? 'PUT' : 'POST';
+    
+    // Preserve starred status when editing
+    if (blogId) {
+        // Find the star button for this blog to get current starred status
+        const starButtons = document.querySelectorAll('.btn-star');
+        for (const starBtn of starButtons) {
+            const onclickAttr = starBtn.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes(`toggleBlogStar(${blogId}`)) {
+                blogData.starred = starBtn.classList.contains('starred');
+                break;
+            }
+        }
+    } else {
+        // New blogs default to not starred
+        blogData.starred = false;
+    }
     
     try {
         const response = await fetch(url, {
